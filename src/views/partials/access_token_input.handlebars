@@ -1,4 +1,4 @@
-<div class='container py-4'>
+<div class='container py-4 px-0'>
     <form
         id='form-access-token'
         class='mb-3 d-flex justify-content-center flex-row align-items-center'
@@ -10,10 +10,24 @@
             class='form-control me-3'
             placeholder='Enter access token'
         />
-        <button class='btn btn-primary px-3' type='submit'>SAVE</button>
+        <button class='btn btn-primary' id="save-access-token-btn" type='submit'>SAVE</button>
     </form>
 </div>
 <script>
-    const inputAccessToken = document.getElementById('input-access-token'); const formAccessToken =
-    document.getElementById('form-access-token');
+    const inputAccessToken = document.getElementById('input-access-token');
+    const saveAccessTokenBtn = document.getElementById('save-access-token-btn');
+
+    saveAccessTokenBtn.addEventListener('click', async function(event) {
+        event.preventDefault();
+        const accessToken = inputAccessToken.value;
+        console.log(accessToken);
+        fetch('/fb/access-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({accessToken: accessToken})
+        });
+    })
+
 </script>

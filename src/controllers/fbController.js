@@ -1,4 +1,4 @@
-const { httpRequest } = require('../utils/httpRequest');
+const { httpRequest, setAccessToken } = require('../utils/httpRequest');
 
 const fbController = {
     getInfo: async (req, res) => {
@@ -26,10 +26,10 @@ const fbController = {
                 return {id: conversation.id, participant: p[0]};
             });
             
-            return res.render('components/home', { info: pageInfo, conversations: c });
+            return res.render('components/home', { info: pageInfo, conversations: c});
         } catch (error) {
             console.error('Error fetching info from Facebook:', error);
-            return res.status(500).json({ error: 'Failed to fetch info' });
+            return res.render('components/error-page', { message: 'Failed to fetch info from Facebook' });
         }
     },
 
@@ -70,7 +70,7 @@ const fbController = {
             console.error('Error sending message:', error);
             return res.status(500).json({ error: 'Failed to send message' });
         }
-    }
+    },
 };
 
 module.exports = fbController;
