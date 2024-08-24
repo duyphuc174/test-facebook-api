@@ -1,0 +1,124 @@
+<div class='row'>
+    <div class='col-3'>
+        <div class='card mb-4'>
+            <div class='card-body text-center'>
+                <div class='mb-3'>ID: {{info.id}}</div>
+                <img
+                    src={{info.picture.data.url}}
+                    alt='avatar'
+                    class='rounded-circle img-fluid'
+                    style='width: 150px;'
+                />
+                <h5 class='my-3'>{{info.name}}</h5>
+                <p class='text-muted mb-4'>{{info.location}}</p>
+            </div>
+        </div>
+    </div>
+    <div class='col-9'>
+        <div class='card'>
+            <div class='card-content'>
+                <div class='row g-0'>
+                    <div class='col-4'>
+                        <div class='card border-0'>
+                            <div class='card-header'>
+                                <h6 class='card-title'>Participants</h6>
+                            </div>
+                            <div class='card-body'>
+                                <ul class='list-group'>
+                                    {{#each conversations}}
+                                        <li
+                                            class='list-group-item d-flex participant-item'
+                                            style="cursor: pointer;"
+                                            data-id='{{id}}'
+                                            data-particiant-id="{{participant.id}}"
+                                        >
+                                            <div class="d-flex flex-column align-items-center">
+                                                <p class="m-0">c_id: {{id}}</p>
+                                                <p class="m-0">name: {{participant.name}}</p>
+                                                {{!-- <p class="m-0">p_id: {{participant.id}}</p></p> --}}
+                                            </div>
+                                        </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-8'>
+                        <div class='card border-0'>
+                            <div class='card-header'>
+                                <h6 class='card-title' id="card-title-participant">Messages</h6>
+                            </div>
+                            <div class='card-body'>
+                                <div  id='message-container'>
+
+                                <!-- Messages will be loaded here -->
+                                </div>
+                                <form action="" class="d-flex align-items-center flex-row">
+                                    <input type="text" id="message-input" class="form-control">
+                                    <button type="button" id="send-btn" class="btn btn-primary ms-3">Send</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        let pIdSlect
+        const cardTitle = document.getElementById('card-title-participant');
+document.querySelectorAll('.participant-item').forEach(item => {
+    item.addEventListener('click', async function() {
+        const participantId = this.getAttribute('data-id');
+        const pId = this.getAttribute('data-particiant-id');
+
+        pIdSlect = pId
+
+        cardTitle.innerHTML = `Participant: ${participantId}`
+        
+        const response = await fetch(`/fb/messages/${participantId}`, {
+            method: 'GET'
+        });
+        const messages = await response.json();
+
+        // Hiển thị tin nhắn trong message-container
+        const messageContainer = document.getElementById('message-container');
+        messageContainer.innerHTML = ''; // Clear current messages
+
+        messages.reverse();
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('mb-1');
+            messageElement.innerHTML = message.from.name + ': ' + message.message;
+            messageContainer.appendChild(messageElement);
+        });
+    });
+});
+
+const messageInput = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
+sendBtn.addEventListener('click', async function(event) {
+    event.preventDefault();
+    const value = messageInput.value;
+    const bd = {
+        recipient: {
+            id: pIdSlect
+        },
+        message: {
+            text: value
+        }
+    }
+
+    fetch('/fb/messages', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bd)
+    });
+    messageInput.value = '';
+})
+</script>
+
